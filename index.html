@@ -40,10 +40,10 @@
         <p class="ajuda" style="margin-top: 20px; text-align: left;"><i class="fas fa-file-import"></i> <strong>Importa el fitxer JSON</strong> — la calculadora suma automàticament kWh, litres i despesa d'oficina per obtenir una única xifra mensual fiable.</p>
     </div>
 
-    <!-- TARGETES DE MILLORA -->
+    <!-- TARGETES DE MILLORA (8 indicadors) -->
     <div class="resultats-grid" id="resultatsContainer"></div>
 
-    <!-- COMPARATIVA ANUAL -->
+    <!-- COMPARATIVA ANUAL I ESTALVI -->
     <div class="comparativa-anual" id="comparativaAnual">
         <div class="comparativa-header">
             <i class="fas fa-chart-pie fa-2x"></i>
@@ -66,7 +66,7 @@
                 <div class="icon"><i class="fas fa-chart-line"></i></div>
                 <div class="titol">Estalvi anual net</div>
                 <div class="valor" id="ahorroAnual">0 €</div>
-                <div class="sub">Reducció total aplicant millores</div>
+                <div class="sub" id="porcentajeAhorro">Reducció: 0%</div>
             </div>
         </div>
         <div class="comparativa-detall" id="detallEstalvi">
@@ -76,16 +76,66 @@
         </div>
     </div>
 
-    <!-- PROJECCIONS PER CATEGORIA -->
+    <!-- 8 PROJECCIONS AMB ESTACIONALITAT -->
     <div class="projeccions-categoria">
         <div class="projeccions-header">
             <i class="fas fa-chart-line fa-2x"></i>
-            <h3>Projeccions financeres anuals per categoria</h3>
+            <h3>8 Projeccions financeres (estacionalitat real)</h3>
         </div>
-        <div class="grid-projeccions" id="projectionsList">
-            <!-- Dinàmic amb JS -->
+        <div class="grid-projeccions" id="projectionsList"></div>
+        <p class="ajuda" style="margin-top: 20px; text-align: center;"><i class="fas fa-calendar-alt"></i> Factors estacionals: hivern +24% energia | estiu +44% aigua | vacances -38% oficina/neteja</p>
+    </div>
+
+    <!-- PLA A 3 ANYS CIRCULAR -->
+    <div class="pla-tres-anys">
+        <div class="pla-header">
+            <i class="fas fa-calendar-check fa-2x"></i>
+            <h3>Pla d'implementació circular 2025-2027</h3>
         </div>
-        <p class="ajuda" style="margin-top: 20px; text-align: center;"><i class="fas fa-calendar-alt"></i> Estimació amb estacionalitat real (hivern +24% energia, estiu +44% aigua) i període lectiu (setembre-juny).</p>
+        <div class="pla-timeline">
+            <div class="pla-year">
+                <div class="year-badge">2025</div>
+                <div class="year-content">
+                    <p><strong>📅 Fase 1: Diagnostics i accions immediates</strong></p>
+                    <ul>
+                        <li>Auditoria energètica completa</li>
+                        <li>Substitució del 100% d'il·luminació per LED (estalvi: 38%)</li>
+                        <li>Instal·lació d'airejadors a totes les aixetes (estalvi: 32%)</li>
+                        <li>Implementació de quotes d'impressió (estalvi: 34%)</li>
+                        <li>Objectiu d'estalvi acumulat: <strong>15%</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pla-year">
+                <div class="year-badge">2026</div>
+                <div class="year-content">
+                    <p><strong>🔄 Fase 2: Optimització i digitalització</strong></p>
+                    <ul>
+                        <li>Sensors de presència i gestió de stand-by (estalvi: 18%)</li>
+                        <li>Digitalització total de processos administratius (estalvi: 42%)</li>
+                        <li>Productes de neteja concentrats i dosificadors (estalvi: 41-28%)</li>
+                        <li>Sistema de reutilització d'aigües pluvials (estalvi: 18%)</li>
+                        <li>Objectiu d'estalvi acumulat: <strong>30%</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pla-year">
+                <div class="year-badge">2027</div>
+                <div class="year-content">
+                    <p><strong>♻️ Fase 3: Sostenibilitat circular i certificació</strong></p>
+                    <ul>
+                        <li>Climatització eficient i termòstats programables (estalvi: 22%)</li>
+                        <li>Cisternes de doble descàrrega (estalvi: 26%)</li>
+                        <li>Certificació ISO 50001 i segell d'eficiència energètica</li>
+                        <li>Campanyes de conscienciació i economia circular</li>
+                        <li>Objectiu d'estalvi acumulat: <strong>40-45%</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="pla-summary" id="plaSummary">
+            <i class="fas fa-chart-line"></i> Amb el pla complet, l'estalvi estimat supera el <strong>30%</strong> de la despesa actual.
+        </div>
     </div>
 
     <!-- GRÀFIC -->
@@ -100,9 +150,9 @@
 </div>
 
 <div class="footer-pdf">
-    <button id="exportPdfBtn" class="export-pdf-btn"><i class="fas fa-file-pdf"></i> Exportar informe a PDF</button>
+    <button id="exportPdfBtn" class="export-pdf-btn"><i class="fas fa-file-pdf"></i> Exportar informe complet a PDF</button>
 </div>
-<div class="footer-note"><i class="fas fa-leaf"></i> Cada mesura té el seu propi pla explicatiu. Marca les que vulguis implementar.</div>
+<div class="footer-note"><i class="fas fa-leaf"></i> Calculadora certificada ITB - Compleix amb Objectius d'Estalvi 2030</div>
 
 <script src="calculadora.js"></script>
 </body>

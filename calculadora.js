@@ -1,21 +1,21 @@
-// ---------- MILLORES DISPONIBLES ----------
+// ---------- MILLORES DISPONIBLES (TOTES DESACTIVADES PER DEFECTE) ----------
 const milloresDisponibles = {
     energia: [
-        { id: "ene_led", nom: "Il·luminació LED + sensors presència", estalviPct: 38, activa: true, icona: "fa-lightbulb", descripcio: "Substitució de fluorescents per LED i instal·lació de sensors de moviment. Redueix el consum d'enllumenat fins un 38%, amb un retorn de la inversió en menys d'un any." },
-        { id: "ene_gestio", nom: "Gestió equips (stand-by, regletes)", estalviPct: 18, activa: true, icona: "fa-microchip", descripcio: "Eliminació del consum fantasma mitjançant regletes intel·ligents i apagada automàtica d'equips. Estalvi addicional del 18% sobre la factura elèctrica." },
+        { id: "ene_led", nom: "Il·luminació LED + sensors presència", estalviPct: 38, activa: false, icona: "fa-lightbulb", descripcio: "Substitució de fluorescents per LED i instal·lació de sensors de moviment. Redueix el consum d'enllumenat fins un 38%, amb un retorn de la inversió en menys d'un any." },
+        { id: "ene_gestio", nom: "Gestió equips (stand-by, regletes)", estalviPct: 18, activa: false, icona: "fa-microchip", descripcio: "Eliminació del consum fantasma mitjançant regletes intel·ligents i apagada automàtica d'equips. Estalvi addicional del 18% sobre la factura elèctrica." },
         { id: "ene_clima", nom: "Climatització eficient", estalviPct: 22, activa: false, icona: "fa-temperature-low", descripcio: "Instal·lació de termòstats programables, millora de l'aïllament i manteniment preventiu de climatitzadors. Reducció del 22% en calefacció i aire condicionat." }
     ],
     aigua: [
-        { id: "aig_airejadors", nom: "Airejadors i reductors cabal", estalviPct: 32, activa: true, icona: "fa-wind", descripcio: "Col·locació d'airejadors a totes les aixetes. Estalvi del 32% del cabal sense perdre confort. Inversió mínima, amortització en pocs mesos." },
+        { id: "aig_airejadors", nom: "Airejadors i reductors cabal", estalviPct: 32, activa: false, icona: "fa-wind", descripcio: "Col·locació d'airejadors a totes les aixetes. Estalvi del 32% del cabal sense perdre confort. Inversió mínima, amortització en pocs mesos." },
         { id: "aig_cisternes", nom: "Cisternes doble descàrrega", estalviPct: 26, activa: false, icona: "fa-toilet", descripcio: "Substitució de cisternes antigues per models de 3/6 litres. Estalvi del 26% en el consum d'aigua dels lavabos." },
         { id: "aig_reutil", nom: "Reutilització pluvial", estalviPct: 18, activa: false, icona: "fa-cloud-rain", descripcio: "Sistema de captació d'aigua de pluja per a reg i neteja exterior. Reducció addicional del 18% de la factura." }
     ],
     oficina: [
-        { id: "ofi_quotes", nom: "Quotes impressió", estalviPct: 34, activa: true, icona: "fa-ban", descripcio: "Establiment de quotes d'impressió per usuari i configuració per defecte en blanc i negre. Estalvi del 34% en paper i tòner." },
+        { id: "ofi_quotes", nom: "Quotes impressió", estalviPct: 34, activa: false, icona: "fa-ban", descripcio: "Establiment de quotes d'impressió per usuari i configuració per defecte en blanc i negre. Estalvi del 34% en paper i tòner." },
         { id: "ofi_digital", nom: "Digitalització total", estalviPct: 42, activa: false, icona: "fa-tablet-alt", descripcio: "Implementació de firma digital, emmagatzematge al núvol i eliminació de fluxos en paper. Estalvi del 42% en consumibles i millora de l'eficiència." }
     ],
     neteja: [
-        { id: "net_eco", nom: "Productes ecològics concentrats", estalviPct: 41, activa: true, icona: "fa-leaf", descripcio: "Adopció de productes ultraconcentrats i biodegradables. Reducció del 41% del cost en neteja i menys residus plàstics." },
+        { id: "net_eco", nom: "Productes ecològics concentrats", estalviPct: 41, activa: false, icona: "fa-leaf", descripcio: "Adopció de productes ultraconcentrats i biodegradables. Reducció del 41% del cost en neteja i menys residus plàstics." },
         { id: "net_dosi", nom: "Dosificadors automàtics", estalviPct: 28, activa: false, icona: "fa-pump-medical", descripcio: "Sistemes de dosificació que barregen el producte en el moment d'ús. Estalvi del 28% per evitar malbaratament." }
     ]
 };
@@ -26,7 +26,8 @@ function inicialitzarEstat() {
     for (let cat in milloresDisponibles) {
         milloresDisponibles[cat].forEach(m => {
             let saved = localStorage.getItem(m.id);
-            estatMillores[m.id] = saved !== null ? saved === 'true' : m.activa;
+            // Si no hi ha res guardat, comença desactivat (false)
+            estatMillores[m.id] = saved !== null ? saved === 'true' : false;
         });
     }
 }
@@ -67,6 +68,7 @@ function actualitzarComparativaAnual() {
     document.getElementById('ahorroMensualMedio').innerHTML = totals.estalviMensualTotal.toFixed(2) + ' €';
     let porcentaje = totals.actualAnual > 0 ? (totals.estalviAnual / totals.actualAnual * 100) : 0;
     document.getElementById('reduccionPorcentual').innerHTML = porcentaje.toFixed(1) + '%';
+    document.getElementById('porcentajeAhorro').innerHTML = `Reducció: ${porcentaje.toFixed(1)}%`;
     let retorno = totals.estalviAnual > 0 ? (3000 / totals.estalviAnual * 12).toFixed(1) : '—';
     document.getElementById('retornoInversion').innerHTML = retorno !== '—' ? retorno + ' mesos' : '—';
 }
@@ -82,6 +84,7 @@ function actualitzarProjeccions() {
     const baseOfi = costOfi * 12;
     const baseNet = costNet * 12;
 
+    // Factors estacionals reals
     const factorsEne = [1.24, 1.24, 1.08, 0.94, 0.86, 0.78, 0.75, 0.78, 0.88, 0.96, 1.12, 1.22];
     const factorsAigua = [0.92, 0.92, 0.96, 1.02, 1.18, 1.32, 1.44, 1.38, 1.24, 1.08, 0.98, 0.94];
     const factorsCons = [1.28, 1.28, 1.22, 1.18, 1.24, 1.20, 0.62, 0.58, 1.32, 1.34, 1.30, 1.28];
@@ -406,29 +409,13 @@ document.getElementById('exportPdfBtn').addEventListener('click', async function
             return suma;
         }
 
-        const projEne = {
-            any: projectAny(baseElec, factorsEne),
-            period: projectPeriod(baseElec, factorsEne)
-        };
-        const projAigua = {
-            any: projectAny(baseAigua, factorsAigua),
-            period: projectPeriod(baseAigua, factorsAigua)
-        };
-        const projOfi = {
-            any: projectAny(baseOfi, factorsCons),
-            period: projectPeriod(baseOfi, factorsCons)
-        };
-        const projNet = {
-            any: projectAny(baseNet, factorsCons),
-            period: projectPeriod(baseNet, factorsCons)
-        };
+        const projEne = { any: projectAny(baseElec, factorsEne), period: projectPeriod(baseElec, factorsEne) };
+        const projAigua = { any: projectAny(baseAigua, factorsAigua), period: projectPeriod(baseAigua, factorsAigua) };
+        const projOfi = { any: projectAny(baseOfi, factorsCons), period: projectPeriod(baseOfi, factorsCons) };
+        const projNet = { any: projectAny(baseNet, factorsCons), period: projectPeriod(baseNet, factorsCons) };
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        });
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
         let y = 20;
         const leftMargin = 20;
         const pageWidth = 210;
@@ -485,8 +472,6 @@ document.getElementById('exportPdfBtn').addEventListener('click', async function
         pdf.text(`Estalvi anual net: ${totals.estalviAnual.toFixed(0)} € (${totals.estalviMensualTotal.toFixed(2)} €/mes)`, leftMargin, y);
         y += 6;
         pdf.text(`Reducció percentual: ${((totals.estalviAnual / totals.actualAnual) * 100 || 0).toFixed(1)}%`, leftMargin, y);
-        y += 6;
-        pdf.text(`Retorn inversió estimat: ${totals.estalviAnual > 0 ? (3000 / totals.estalviAnual * 12).toFixed(1) + ' mesos' : '—'}`, leftMargin, y);
         y += 12;
 
         pdf.setFontSize(14);
@@ -511,7 +496,6 @@ document.getElementById('exportPdfBtn').addEventListener('click', async function
         const imgWidth = 160;
         const imgHeight = (chartImage.height * imgWidth) / chartImage.width;
         pdf.addImage(chartDataUrl, 'PNG', (pageWidth - imgWidth) / 2, y, imgWidth, imgHeight);
-        y += imgHeight + 10;
 
         const pageCount = pdf.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
