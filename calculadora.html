@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ITB · Calculadora d'estalvi sostenible</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="calculadora.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-leaf"></i> ITB · Calculadora d'estalvi sostenible</h1>
+        <div class="badge-simple"><i class="fas fa-chart-simple"></i> Activa millores i compara l'estalvi anual</div>
+    </div>
+
+    <div class="json-upload">
+        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+            <label class="upload-label" for="jsonUpload"><i class="fas fa-cloud-upload-alt fa-lg"></i> Pujar dades (JSON)</label>
+            <input type="file" id="jsonUpload" accept=".json" style="display: none;">
+            <span class="file-status" id="fileStatus"><i class="fas fa-info-circle"></i> Cap fitxer carregat</span>
+        </div>
+        <button id="resetBtn" class="reset-btn"><i class="fas fa-undo-alt"></i> Reiniciar valors</button>
+    </div>
+
+    <div class="card-dades">
+        <h2><i class="fas fa-charging-station"></i> Consums mensuals reals</h2>
+        <div class="grid-inputs">
+            <div class="input-grup"><label><i class="fas fa-bolt"></i> Electricitat (€/mes)</label><input type="number" id="cost_elec" value="0" step="5"><div class="ajuda">Factura mitjana mensual</div></div>
+            <div class="input-grup"><label><i class="fas fa-water"></i> Aigua (€/mes)</label><input type="number" id="cost_aigua" value="0" step="5"><div class="ajuda">Consum + canonada</div></div>
+            <div class="input-grup"><label><i class="fas fa-print"></i> Oficina (€/mes)</label><input type="number" id="cost_oficina" value="0" step="10"><div class="ajuda">Paper, tòners, subministraments</div></div>
+            <div class="input-grup"><label><i class="fas fa-spray-can"></i> Neteja (€/mes)</label><input type="number" id="cost_neteja" value="0" step="5"><div class="ajuda">Productes i dosificació</div></div>
+        </div>
+        <p class="ajuda" style="margin-top: 20px; text-align: left;"><i class="fas fa-file-import"></i> <strong>Importa el fitxer JSON</strong> — la calculadora suma automàticament kWh, litres i despesa d'oficina per obtenir una única xifra mensual fiable.</p>
+    </div>
+
+    <!-- TARGETES DE MILLORA -->
+    <div class="resultats-grid" id="resultatsContainer"></div>
+
+    <!-- COMPARATIVA ANUAL -->
+    <div class="comparativa-anual" id="comparativaAnual">
+        <div class="comparativa-header">
+            <i class="fas fa-chart-pie fa-2x"></i>
+            <h3>Comparativa anual: estat actual vs. amb millores</h3>
+        </div>
+        <div class="comparativa-cards">
+            <div class="card-comparativa">
+                <div class="icon"><i class="fas fa-euro-sign"></i></div>
+                <div class="titol">Despesa actual anual</div>
+                <div class="valor" id="gastoActualAnual">0 €</div>
+                <div class="sub">Sense cap millora aplicada</div>
+            </div>
+            <div class="card-comparativa">
+                <div class="icon"><i class="fas fa-leaf"></i></div>
+                <div class="titol">Despesa amb millores actives</div>
+                <div class="valor" id="gastoOptimizadoAnual">0 €</div>
+                <div class="sub">Amb les caselles marcades a dalt</div>
+            </div>
+            <div class="card-comparativa card-estalvi">
+                <div class="icon"><i class="fas fa-chart-line"></i></div>
+                <div class="titol">Estalvi anual net</div>
+                <div class="valor" id="ahorroAnual">0 €</div>
+                <div class="sub">Reducció total aplicant millores</div>
+            </div>
+        </div>
+        <div class="comparativa-detall" id="detallEstalvi">
+            <span><i class="fas fa-chart-line"></i> Estalvi mensual mitjà: <strong id="ahorroMensualMedio">0 €</strong></span>
+            <span><i class="fas fa-percent"></i> Reducció percentual: <strong id="reduccionPorcentual">0%</strong></span>
+            <span><i class="fas fa-calendar-week"></i> Retorn inversió estimat: <strong id="retornoInversion">—</strong></span>
+        </div>
+    </div>
+
+    <!-- PROJECCIONS PER CATEGORIA -->
+    <div class="projeccions-categoria">
+        <div class="projeccions-header">
+            <i class="fas fa-chart-line fa-2x"></i>
+            <h3>Projeccions financeres anuals per categoria</h3>
+        </div>
+        <div class="grid-projeccions" id="projectionsList">
+            <!-- Dinàmic amb JS -->
+        </div>
+        <p class="ajuda" style="margin-top: 20px; text-align: center;"><i class="fas fa-calendar-alt"></i> Estimació amb estacionalitat real (hivern +24% energia, estiu +44% aigua) i període lectiu (setembre-juny).</p>
+    </div>
+
+    <!-- GRÀFIC -->
+    <div class="peu-grafic">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 18px; margin-bottom: 24px;">
+            <span><i class="fas fa-chart-simple"></i> <strong>Comparativa de despesa mensual</strong></span>
+            <select id="chartTypeSelect"><option value="bar">📊 Barres</option><option value="line">📈 Línies</option><option value="radar">🕸️ Radar</option></select>
+        </div>
+        <canvas id="comparativaChart" width="400" height="200" style="max-height: 340px;"></canvas>
+        <p class="ajuda" style="margin-top: 18px;"><i class="fas fa-toggle-on"></i> Activa/desactiva cada millora i observa l'estalvi i el missatge personalitzat.</p>
+    </div>
+</div>
+
+<div class="footer-pdf">
+    <button id="exportPdfBtn" class="export-pdf-btn"><i class="fas fa-file-pdf"></i> Exportar informe a PDF</button>
+</div>
+<div class="footer-note"><i class="fas fa-leaf"></i> Cada mesura té el seu propi pla explicatiu. Marca les que vulguis implementar.</div>
+
+<script src="calculadora.js"></script>
+</body>
+</html>
